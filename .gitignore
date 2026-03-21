@@ -1,5 +1,6 @@
-.bat
-.class
+*.bat
+*.class
 *.interp
 *.tokens
-
+*.json
+/.vscode/
