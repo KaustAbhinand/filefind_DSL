@@ -1,10 +1,35 @@
-## FILEFIND - A custom DSL ##
+# FILEFIND - A Custom DSL
 
-This is filefind, a custom DSL used to retreive files on the computer.
--- It follows an SQL like syntax.
--- Sample query: find file from "\C:\Users" where ext = "pdf" - retreives the pdf files from Users directory.
--- Conditions can be given on: size, extension, created date, date modified, and an option recently - defaults to 15 days ago.
---
-More features need to be added - Mathematics, Error messages, and creating an installer. 
-Will give those asap :) !
---
+A custom Domain Specific Language (DSL) used to retrieve files on the computer.
+
+## Overview
+
+- Follows a simple, SQL-like syntax
+- Search for files by extension, size, created date, and date modified
+- Supports `recently` keyword — defaults to files from the last 15 days
+
+## Sample Query
+
+```sql
+find file from "C:\Users" where ext = "pdf"
+```
+
+Retrieves all PDF files from the Users directory.
+
+## Supported Conditions
+
+- `ext` — file extension (e.g. `ext = "pdf"`)
+- `size` — file size in bytes (e.g. `size > 10000`)
+- `created` — creation date (e.g. `created = recently`)
+- `date-modified` — last modified date (e.g. `date-modified < 30`)
+
+## Roadmap
+
+- [ ] Mathematics in conditions
+- [ ] Error messages
+- [ ] Installer / JAR packaging
+- [ ] Logical operators (and, or, nor)
+
+---
+
+More features coming soon! :)
