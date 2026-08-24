@@ -1,3 +1,5 @@
+package com.kaustabhinand.filefind.model;
+
 public class ExprCondition {
     public String Field;
     public String Operator;

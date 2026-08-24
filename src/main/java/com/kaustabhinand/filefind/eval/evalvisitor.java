@@ -1,3 +1,9 @@
+package com.kaustabhinand.filefind.eval;
+
+import com.kaustabhinand.filefind.model.ExprCondition;
+import com.kaustabhinand.filefind.filefindBaseVisitor;
+import com.kaustabhinand.filefind.filefindParser;
+
 //import org.antlr.v4.runtime.tree.*;
 //import org.antlr.v4.runtime.*;
 import java.util.*;
