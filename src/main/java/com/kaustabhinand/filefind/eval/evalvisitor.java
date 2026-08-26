@@ -57,8 +57,7 @@ public class evalvisitor extends filefindBaseVisitor<Object> {
         }
 
         if(ctx.CREATED() != null && ctx.RECENTLY() != null) { // Recently is given.
-            String op = ctx.relop().getText();
-            conditions.add(new ExprCondition("created", op, "recently"));
+            conditions.add(new ExprCondition("created", "=", "recently"));
         }
 
         if(ctx.CREATED() != null && ctx.RECENTLY() == null) { // Time is mentioned.
