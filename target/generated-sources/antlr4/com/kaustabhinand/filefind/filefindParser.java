@@ -320,7 +320,7 @@ public class filefindParser extends Parser {
 		ExprContext _localctx = new ExprContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_expr);
 		try {
-			setState(99);
+			setState(105);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,2,_ctx) ) {
 			case 1:
@@ -442,25 +442,40 @@ public class filefindParser extends Parser {
 				enterOuterAlt(_localctx, 10);
 				{
 				setState(89);
-				match(DATE_MODIFIED);
+				match(CREATED);
 				setState(90);
-				relop();
+				match(EQ);
 				setState(91);
-				time();
+				match(RECENTLY);
+				setState(92);
+				logop();
+				setState(93);
+				expr();
 				}
 				break;
 			case 11:
 				enterOuterAlt(_localctx, 11);
 				{
-				setState(93);
-				match(DATE_MODIFIED);
-				setState(94);
-				relop();
 				setState(95);
-				time();
+				match(DATE_MODIFIED);
 				setState(96);
-				logop();
+				relop();
 				setState(97);
+				time();
+				}
+				break;
+			case 12:
+				enterOuterAlt(_localctx, 12);
+				{
+				setState(99);
+				match(DATE_MODIFIED);
+				setState(100);
+				relop();
+				setState(101);
+				time();
+				setState(102);
+				logop();
+				setState(103);
 				expr();
 				}
 				break;
@@ -503,7 +518,7 @@ public class filefindParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(101);
+			setState(107);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 66060288L) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -550,7 +565,7 @@ public class filefindParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(103);
+			setState(109);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 983040L) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -594,33 +609,33 @@ public class filefindParser extends Parser {
 		TimeContext _localctx = new TimeContext(_ctx, getState());
 		enterRule(_localctx, 8, RULE_time);
 		try {
-			setState(111);
+			setState(117);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(105);
+				setState(111);
 				match(NUMBER);
-				setState(106);
+				setState(112);
 				match(DAYS);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(107);
+				setState(113);
 				match(NUMBER);
-				setState(108);
+				setState(114);
 				match(MONS);
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(109);
+				setState(115);
 				match(NUMBER);
-				setState(110);
+				setState(116);
 				match(YRS);
 				}
 				break;
@@ -638,7 +653,7 @@ public class filefindParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001\u001cr\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u0001\u001cx\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0001"+
 		"\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001"+
 		"\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001"+
@@ -654,13 +669,14 @@ public class filefindParser extends Parser {
 		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
 		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
 		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
-		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0003\u0001d\b\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0003\u0001j\b\u0001"+
 		"\u0001\u0002\u0001\u0002\u0001\u0003\u0001\u0003\u0001\u0004\u0001\u0004"+
-		"\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0004\u0003\u0004p\b\u0004"+
+		"\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0004\u0003\u0004v\b\u0004"+
 		"\u0001\u0004\u0000\u0000\u0005\u0000\u0002\u0004\u0006\b\u0000\u0003\u0002"+
 		"\u0000\f\f\u001b\u001b\u0001\u0000\u0014\u0019\u0001\u0000\u0010\u0013"+
-		"}\u0000-\u0001\u0000\u0000\u0000\u0002c\u0001\u0000\u0000\u0000\u0004"+
-		"e\u0001\u0000\u0000\u0000\u0006g\u0001\u0000\u0000\u0000\bo\u0001\u0000"+
+		"\u0084\u0000-\u0001\u0000\u0000\u0000\u0002i\u0001\u0000\u0000\u0000\u0004"+
+		"k\u0001\u0000\u0000\u0000\u0006m\u0001\u0000\u0000\u0000\bu\u0001\u0000"+
 		"\u0000\u0000\n\u000b\u0005\u0001\u0000\u0000\u000b\f\u0007\u0000\u0000"+
 		"\u0000\f.\u0005\u0000\u0000\u0001\r\u000e\u0005\u0001\u0000\u0000\u000e"+
 		"\u000f\u0007\u0000\u0000\u0000\u000f\u0010\u0005\u0002\u0000\u0000\u0010"+
@@ -680,34 +696,36 @@ public class filefindParser extends Parser {
 		"\u0000-\r\u0001\u0000\u0000\u0000-\u0012\u0001\u0000\u0000\u0000-\u0018"+
 		"\u0001\u0000\u0000\u0000- \u0001\u0000\u0000\u0000.\u0001\u0001\u0000"+
 		"\u0000\u0000/0\u0005\u0004\u0000\u000001\u0003\u0004\u0002\u000012\u0005"+
-		"\u001b\u0000\u00002d\u0001\u0000\u0000\u000034\u0005\u0004\u0000\u0000"+
+		"\u001b\u0000\u00002j\u0001\u0000\u0000\u000034\u0005\u0004\u0000\u0000"+
 		"45\u0003\u0004\u0002\u000056\u0005\u001b\u0000\u000067\u0003\u0006\u0003"+
-		"\u000078\u0003\u0002\u0001\u00008d\u0001\u0000\u0000\u00009:\u0005\u0004"+
-		"\u0000\u0000:;\u0005\u000b\u0000\u0000;d\u0005\u001b\u0000\u0000<=\u0005"+
+		"\u000078\u0003\u0002\u0001\u00008j\u0001\u0000\u0000\u00009:\u0005\u0004"+
+		"\u0000\u0000:;\u0005\u000b\u0000\u0000;j\u0005\u001b\u0000\u0000<=\u0005"+
 		"\u0004\u0000\u0000=>\u0005\u000b\u0000\u0000>?\u0005\u001b\u0000\u0000"+
-		"?@\u0003\u0006\u0003\u0000@A\u0003\u0002\u0001\u0000Ad\u0001\u0000\u0000"+
+		"?@\u0003\u0006\u0003\u0000@A\u0003\u0002\u0001\u0000Aj\u0001\u0000\u0000"+
 		"\u0000BC\u0005\n\u0000\u0000CD\u0003\u0004\u0002\u0000DE\u0005\u001a\u0000"+
-		"\u0000Ed\u0001\u0000\u0000\u0000FG\u0005\n\u0000\u0000GH\u0003\u0004\u0002"+
+		"\u0000Ej\u0001\u0000\u0000\u0000FG\u0005\n\u0000\u0000GH\u0003\u0004\u0002"+
 		"\u0000HI\u0005\u001a\u0000\u0000IJ\u0003\u0006\u0003\u0000JK\u0003\u0002"+
-		"\u0001\u0000Kd\u0001\u0000\u0000\u0000LM\u0005\u0005\u0000\u0000MN\u0003"+
-		"\u0004\u0002\u0000NO\u0003\b\u0004\u0000Od\u0001\u0000\u0000\u0000PQ\u0005"+
+		"\u0001\u0000Kj\u0001\u0000\u0000\u0000LM\u0005\u0005\u0000\u0000MN\u0003"+
+		"\u0004\u0002\u0000NO\u0003\b\u0004\u0000Oj\u0001\u0000\u0000\u0000PQ\u0005"+
 		"\u0005\u0000\u0000QR\u0003\u0004\u0002\u0000RS\u0003\b\u0004\u0000ST\u0003"+
-		"\u0006\u0003\u0000TU\u0003\u0002\u0001\u0000Ud\u0001\u0000\u0000\u0000"+
-		"VW\u0005\u0005\u0000\u0000WX\u0005\u0014\u0000\u0000Xd\u0005\u0007\u0000"+
-		"\u0000YZ\u0005\u0006\u0000\u0000Z[\u0003\u0004\u0002\u0000[\\\u0003\b"+
-		"\u0004\u0000\\d\u0001\u0000\u0000\u0000]^\u0005\u0006\u0000\u0000^_\u0003"+
-		"\u0004\u0002\u0000_`\u0003\b\u0004\u0000`a\u0003\u0006\u0003\u0000ab\u0003"+
-		"\u0002\u0001\u0000bd\u0001\u0000\u0000\u0000c/\u0001\u0000\u0000\u0000"+
-		"c3\u0001\u0000\u0000\u0000c9\u0001\u0000\u0000\u0000c<\u0001\u0000\u0000"+
-		"\u0000cB\u0001\u0000\u0000\u0000cF\u0001\u0000\u0000\u0000cL\u0001\u0000"+
-		"\u0000\u0000cP\u0001\u0000\u0000\u0000cV\u0001\u0000\u0000\u0000cY\u0001"+
-		"\u0000\u0000\u0000c]\u0001\u0000\u0000\u0000d\u0003\u0001\u0000\u0000"+
-		"\u0000ef\u0007\u0001\u0000\u0000f\u0005\u0001\u0000\u0000\u0000gh\u0007"+
-		"\u0002\u0000\u0000h\u0007\u0001\u0000\u0000\u0000ij\u0005\u001a\u0000"+
-		"\u0000jp\u0005\r\u0000\u0000kl\u0005\u001a\u0000\u0000lp\u0005\u000e\u0000"+
-		"\u0000mn\u0005\u001a\u0000\u0000np\u0005\u000f\u0000\u0000oi\u0001\u0000"+
-		"\u0000\u0000ok\u0001\u0000\u0000\u0000om\u0001\u0000\u0000\u0000p\t\u0001"+
-		"\u0000\u0000\u0000\u0004(-co";
+		"\u0006\u0003\u0000TU\u0003\u0002\u0001\u0000Uj\u0001\u0000\u0000\u0000"+
+		"VW\u0005\u0005\u0000\u0000WX\u0005\u0014\u0000\u0000Xj\u0005\u0007\u0000"+
+		"\u0000YZ\u0005\u0005\u0000\u0000Z[\u0005\u0014\u0000\u0000[\\\u0005\u0007"+
+		"\u0000\u0000\\]\u0003\u0006\u0003\u0000]^\u0003\u0002\u0001\u0000^j\u0001"+
+		"\u0000\u0000\u0000_`\u0005\u0006\u0000\u0000`a\u0003\u0004\u0002\u0000"+
+		"ab\u0003\b\u0004\u0000bj\u0001\u0000\u0000\u0000cd\u0005\u0006\u0000\u0000"+
+		"de\u0003\u0004\u0002\u0000ef\u0003\b\u0004\u0000fg\u0003\u0006\u0003\u0000"+
+		"gh\u0003\u0002\u0001\u0000hj\u0001\u0000\u0000\u0000i/\u0001\u0000\u0000"+
+		"\u0000i3\u0001\u0000\u0000\u0000i9\u0001\u0000\u0000\u0000i<\u0001\u0000"+
+		"\u0000\u0000iB\u0001\u0000\u0000\u0000iF\u0001\u0000\u0000\u0000iL\u0001"+
+		"\u0000\u0000\u0000iP\u0001\u0000\u0000\u0000iV\u0001\u0000\u0000\u0000"+
+		"iY\u0001\u0000\u0000\u0000i_\u0001\u0000\u0000\u0000ic\u0001\u0000\u0000"+
+		"\u0000j\u0003\u0001\u0000\u0000\u0000kl\u0007\u0001\u0000\u0000l\u0005"+
+		"\u0001\u0000\u0000\u0000mn\u0007\u0002\u0000\u0000n\u0007\u0001\u0000"+
+		"\u0000\u0000op\u0005\u001a\u0000\u0000pv\u0005\r\u0000\u0000qr\u0005\u001a"+
+		"\u0000\u0000rv\u0005\u000e\u0000\u0000st\u0005\u001a\u0000\u0000tv\u0005"+
+		"\u000f\u0000\u0000uo\u0001\u0000\u0000\u0000uq\u0001\u0000\u0000\u0000"+
+		"us\u0001\u0000\u0000\u0000v\t\u0001\u0000\u0000\u0000\u0004(-iu";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
