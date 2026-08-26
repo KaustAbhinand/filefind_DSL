@@ -17,6 +17,7 @@ expr  : EXT relop STRING
       | CREATED relop time
       | CREATED relop time logop expr
       | CREATED EQ RECENTLY
+      | CREATED EQ RECENTLY logop expr
       | DATE_MODIFIED relop time
       | DATE_MODIFIED relop time logop expr
       ;
