@@ -1,11 +1,11 @@
+// This file parses the input query.
+
 package com.kaustabhinand.filefind.eval;
 
 import com.kaustabhinand.filefind.model.ExprCondition;
 import com.kaustabhinand.filefind.filefindBaseVisitor;
 import com.kaustabhinand.filefind.filefindParser;
 
-//import org.antlr.v4.runtime.tree.*;
-//import org.antlr.v4.runtime.*;
 import java.util.*;
 public class evalvisitor extends filefindBaseVisitor<Object> {
     private  String searchpath = ".";
@@ -26,8 +26,7 @@ public class evalvisitor extends filefindBaseVisitor<Object> {
                   }    
 
                   else {
-                    searchpath = "C:/Users"; // root directory, by default.
-                    System.out.println("Searchpath: "+ searchpath);
+                    searchpath = "."; // current directory, by default.
                   }
             }
 
@@ -42,11 +41,9 @@ public class evalvisitor extends filefindBaseVisitor<Object> {
 
     @Override
     public Object visitExpr(filefindParser.ExprContext ctx) {
-        System.out.println("VisitExpr called!");
         if(ctx.EXT() != null) { // Extension is given
             String op = ctx.relop().getText();
             String value = ctx.STRING().getText().replace("\"", "");
-            System.out.println("Extension: "+ value);
             conditions.add(new ExprCondition("ext", op, value));
         }
 
