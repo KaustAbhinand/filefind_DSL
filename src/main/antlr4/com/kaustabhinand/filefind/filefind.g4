@@ -8,10 +8,10 @@ query : FIND (STRING | FILE) EOF
       | FIND (STRING | FILE) FROM STRING BEGIN expr+ END EOF
       ;
 
-expr  : EXT relop STRING
-      | EXT relop STRING logop expr
-      | EXT CONTAINS STRING
-      | EXT CONTAINS STRING logop expr
+expr  : EXT relop value
+      | EXT relop value logop expr
+      | EXT CONTAINS value
+      | EXT CONTAINS value logop expr
       | SIZE relop NUMBER
       | SIZE relop NUMBER logop expr
       | CREATED relop time
@@ -25,6 +25,8 @@ expr  : EXT relop STRING
 relop : EQ | GTE | GT | LTE | LT | NEQ ;
 
 logop : AND | OR | NOT | NOR ;
+
+value : STRING | BAREWORD ;
 
 time  : NUMBER DAYS
       | NUMBER MONS
@@ -58,5 +60,6 @@ LTE           : '<=' ;
 LT            : '<' ;
 NEQ           : '!=' ;
 NUMBER        : [0-9]+ ('.' [0-9]+)? ;
-STRING        : '"' (~["])* '"' ;
+STRING        : '\'' (~["])* '\'' ;
+BAREWORD      : [a-zA-Z0-9_.-]+;
 WS            : [ \t\n\r]+ -> skip ;
