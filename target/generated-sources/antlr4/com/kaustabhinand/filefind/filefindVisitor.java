@@ -35,6 +35,12 @@ public interface filefindVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLogop(filefindParser.LogopContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link filefindParser#value}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitValue(filefindParser.ValueContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link filefindParser#time}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
