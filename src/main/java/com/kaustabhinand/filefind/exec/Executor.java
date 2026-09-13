@@ -22,14 +22,6 @@ public class Executor {
         return results;
     }
 
-    /**
-     * Recursively walks a directory tree, evaluating files in parallel at
-     * each level and recursing into subdirectories in parallel. Every
-     * failure point (listing a directory, statting an entry, matching a
-     * file) is caught locally so one inaccessible directory/file never
-     * kills the rest of the walk - this is what lets it run fully
-     * un-elevated against paths like C:\Users.
-     */
     private static void collectFiles(Path dir, List<String> results, String filename, List<ExprCondition> conditions) {
         List<Path> subDirs = new ArrayList<>();
         List<Path> files = new ArrayList<>();
@@ -77,58 +69,101 @@ public class Executor {
         });
     }
 
+    /**
+     * Evaluates whether a file matches the full condition list.
+     *
+     * Each ExprCondition is evaluated independently as a single boolean.
+     * Conditions are then folded left-to-right using each condition's
+     * JoinOp (the and/or/not/nor that follows it in the original query),
+     * so "ext = pdf or ext = jpg" correctly matches either extension
+     * instead of being (incorrectly) ANDed together.
+     *
+     * Fold semantics, applied pairwise left-to-right:
+     *   AND: both sides true
+     *   OR:  at least one side true
+     *   NOT: left true and right false ("left and not right")
+     *   NOR: neither side true
+     */
     public static boolean matches(File file, String filename, List<ExprCondition> conditions) {
         if (filename != null && !file.getName().equals(filename)) {
             return false;
         }
 
-        for (ExprCondition condition : conditions) {
-            switch (condition.Field) {
+        if (conditions.isEmpty()) {
+            return true;
+        }
 
-                case "ext":
-                    String ext = getFileExtension(file);
-                    if (!evaluateCondition(ext, condition.Operator, condition.Value)) {
-                        return false;
-                    }
+        boolean result = evaluateSingle(file, conditions.get(0));
+
+        for (int i = 0; i < conditions.size() - 1; i++) {
+            ExprCondition current = conditions.get(i);
+            ExprCondition next = conditions.get(i + 1);
+            boolean nextResult = evaluateSingle(file, next);
+
+            String joinOp = current.JoinOp;
+            if (joinOp == null) {
+                // No explicit operator between consecutive conditions defaults to AND
+                joinOp = "and";
+            }
+
+            switch (joinOp) {
+                case "and":
+                    result = result && nextResult;
                     break;
-
-                case "contains":
-                    if (!file.getName().contains(condition.Value)) {
-                        return false;
-                    }
+                case "or":
+                    result = result || nextResult;
                     break;
-
-                case "size":
-                    long size = file.length();
-                    if (!evaluateCondition(String.valueOf(size), condition.Operator, condition.Value)) {
-                        return false;
-                    }
+                case "not":
+                    result = result && !nextResult;
                     break;
-
-                case "created":
-                    long createdTime = file.lastModified();
-                    if (condition.Value.equals("recently")) {
-                        long targetTime = System.currentTimeMillis() - (15L * 24 * 60 * 60 * 1000);
-                        if (createdTime < targetTime) {
-                            return false;
-                        }
-                    } else {
-                        long targetTime = Long.parseLong(condition.Value);
-                        if (!evaluateCondition(String.valueOf(createdTime), condition.Operator, String.valueOf(targetTime))) {
-                            return false;
-                        }
-                    }
+                case "nor":
+                    result = !(result || nextResult);
                     break;
-
-                case "date_modified":
-                    long modifiedTime = file.lastModified();
-                    if (!evaluateCondition(String.valueOf(modifiedTime), condition.Operator, condition.Value)) {
-                        return false;
-                    }
+                default:
+                    // Unknown operator - fail safe by treating as AND
+                    result = result && nextResult;
                     break;
             }
         }
-        return true;
+
+        return result;
+    }
+
+    /**
+     * Evaluates a single condition against a file, independent of any
+     * other conditions in the list.
+     */
+    private static boolean evaluateSingle(File file, ExprCondition condition) {
+        switch (condition.Field) {
+
+            case "ext":
+                String ext = getFileExtension(file);
+                return evaluateCondition(ext, condition.Operator, condition.Value);
+
+            case "contains":
+                return file.getName().contains(condition.Value);
+
+            case "size":
+                long size = file.length();
+                return evaluateCondition(String.valueOf(size), condition.Operator, condition.Value);
+
+            case "created":
+                long createdTime = file.lastModified();
+                if (condition.Value.equals("recently")) {
+                    long targetTime = System.currentTimeMillis() - (15L * 24 * 60 * 60 * 1000);
+                    return createdTime >= targetTime;
+                } else {
+                    long targetTime = Long.parseLong(condition.Value);
+                    return evaluateCondition(String.valueOf(createdTime), condition.Operator, String.valueOf(targetTime));
+                }
+
+            case "date_modified":
+                long modifiedTime = file.lastModified();
+                return evaluateCondition(String.valueOf(modifiedTime), condition.Operator, condition.Value);
+
+            default:
+                return false;
+        }
     }
 
     public static boolean evaluateCondition(String parameter, String Operator, String value) {
