@@ -4,3 +4,5 @@
 *.tokens
 *.json
 /.vscode/
+/stage/
+/dist/
