@@ -17,11 +17,88 @@ public interface filefindVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitQuery(filefindParser.QueryContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link filefindParser#expr}.
+	 * Visit a parse tree produced by {@link filefindParser#subject}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExpr(filefindParser.ExprContext ctx);
+	T visitSubject(filefindParser.SubjectContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AndExpr}
+	 * labeled alternative in {@link filefindParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAndExpr(filefindParser.AndExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NotExpr}
+	 * labeled alternative in {@link filefindParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNotExpr(filefindParser.NotExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ParenExpr}
+	 * labeled alternative in {@link filefindParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParenExpr(filefindParser.ParenExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code CondExpr}
+	 * labeled alternative in {@link filefindParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCondExpr(filefindParser.CondExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code OrExpr}
+	 * labeled alternative in {@link filefindParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOrExpr(filefindParser.OrExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExtCond}
+	 * labeled alternative in {@link filefindParser#cond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExtCond(filefindParser.ExtCondContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NameCond}
+	 * labeled alternative in {@link filefindParser#cond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNameCond(filefindParser.NameCondContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SizeCond}
+	 * labeled alternative in {@link filefindParser#cond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSizeCond(filefindParser.SizeCondContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code CreatedCond}
+	 * labeled alternative in {@link filefindParser#cond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreatedCond(filefindParser.CreatedCondContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code RecentCond}
+	 * labeled alternative in {@link filefindParser#cond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRecentCond(filefindParser.RecentCondContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ModifiedCond}
+	 * labeled alternative in {@link filefindParser#cond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitModifiedCond(filefindParser.ModifiedCondContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link filefindParser#relop}.
 	 * @param ctx the parse tree
@@ -29,11 +106,11 @@ public interface filefindVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRelop(filefindParser.RelopContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link filefindParser#logop}.
+	 * Visit a parse tree produced by {@link filefindParser#nameop}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLogop(filefindParser.LogopContext ctx);
+	T visitNameop(filefindParser.NameopContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link filefindParser#value}.
 	 * @param ctx the parse tree

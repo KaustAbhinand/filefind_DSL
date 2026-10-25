@@ -2,13 +2,14 @@ package com.kaustabhinand.filefind.cli;
 
 import com.kaustabhinand.filefind.eval.evalvisitor;
 import com.kaustabhinand.filefind.exec.Executor;
-import com.kaustabhinand.filefind.model.ExprCondition;
 import com.kaustabhinand.filefind.filefindLexer;
 import com.kaustabhinand.filefind.filefindParser;
+import com.kaustabhinand.filefind.model.Expr;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -35,13 +36,13 @@ public class FileFindCommand implements Callable<Integer> {
             index = "0",
             paramLabel = "QUERY",
             description = "The FileFind query to run, e.g.:%n" +
-                    "  \"find file from 'C:\\Users\\you\\Downloads' where ext = java\""
+                    "  \"find file from 'C:\\Users\\you\\Downloads' where name like 'report' and ext = pdf\""
     )
     private String query;
 
     @Option(
             names = {"-v", "--verbose"},
-            description = "Show extra detail while the query runs (parse tree, search path, condition list)."
+            description = "Show extra detail while the query runs (parse tree, search path, filter)."
     )
     private boolean verbose;
 
@@ -66,9 +67,17 @@ public class FileFindCommand implements Callable<Integer> {
     public Integer call() {
         try {
             CharStream input = CharStreams.fromString(query);
+
             filefindLexer lexer = new filefindLexer(input);
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+
             CommonTokenStream tokens = new CommonTokenStream(lexer);
+
             filefindParser parser = new filefindParser(tokens);
+            parser.removeErrorListeners();
+            parser.addErrorListener(ThrowingErrorListener.INSTANCE);
+
             ParseTree tree = parser.query();
 
             if (verbose) {
@@ -80,45 +89,36 @@ public class FileFindCommand implements Callable<Integer> {
 
             String searchPath = visitor.getSearchPath();
             String filename = visitor.getFilename();
-            List<ExprCondition> conditions = visitor.getConditions();
+            Expr filter = visitor.getFilter();
 
             if (verbose) {
                 System.out.println("Search path: " + searchPath);
                 if (filename != null) {
                     System.out.println("Filename: " + filename);
                 }
-                System.out.println("Conditions:");
-                for (ExprCondition condition : conditions) {
-                    System.out.println("  " + condition);
-                }
+                System.out.println("Filter: " + (filter == null ? "(none)" : filter));
                 System.out.println();
             }
 
-            List<String> results = Executor.execute(searchPath, filename, conditions);
-
             if (countOnly) {
-                System.out.println(results.size() + " file(s) matched.");
+                long count = Executor.execute(searchPath, filename, filter, hit -> {
+                });
+                System.out.println(count + " file(s) matched.");
                 return 0;
             }
 
-            if (results.isEmpty()) {
+            long count = Executor.execute(searchPath, filename, filter, System.out::println);
+
+            System.out.println();
+            if (count == 0) {
                 System.out.println("No files found matching the query.");
-                return 0;
+            } else {
+                System.out.println(count + " file(s) matched.");
             }
-
-            System.out.println("Files retrieved:");
-            for (String file : results) {
-                System.out.println(file);
-            }
-
             return 0;
-
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            if (verbose) {
-                e.printStackTrace();
-            }
-            return 1;
+        }
+        catch (RecognitionException e) {
+            throw new RuntimeException(e);
         }
     }
 }

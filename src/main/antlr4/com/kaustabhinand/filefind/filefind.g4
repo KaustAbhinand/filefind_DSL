@@ -1,65 +1,60 @@
 grammar filefind;
 
-// Parser Rules
-query : FIND (STRING | FILE) EOF
-      | FIND (STRING | FILE) FROM STRING EOF
-      | FIND (STRING | FILE) WHERE expr EOF
-      | FIND (STRING | FILE) FROM STRING WHERE expr EOF
-      | FIND (STRING | FILE) FROM STRING BEGIN expr+ END EOF
-      ;
+query   : FIND subject (FROM STRING)? (WHERE expr)? EOF
+        | FIND subject FROM STRING BEGIN expr END EOF
+        ;
 
-expr  : EXT relop value
-      | EXT relop value logop expr
-      | EXT CONTAINS value
-      | EXT CONTAINS value logop expr
-      | SIZE relop NUMBER
-      | SIZE relop NUMBER logop expr
-      | CREATED relop time
-      | CREATED relop time logop expr
-      | CREATED EQ RECENTLY
-      | CREATED EQ RECENTLY logop expr
-      | DATE_MODIFIED relop time
-      | DATE_MODIFIED relop time logop expr
-      ;
+subject : FILE | STRING ;
 
-relop : EQ | GTE | GT | LTE | LT | NEQ ;
+// Alternatives listed first bind tighter: NOT > AND > OR
+expr    : NOT expr                 # NotExpr
+        | expr AND expr            # AndExpr
+        | expr OR expr             # OrExpr
+        | LPAREN expr RPAREN       # ParenExpr
+        | cond                     # CondExpr
+        ;
 
-logop : AND | OR | NOT | NOR ;
+cond    : EXT relop value          # ExtCond
+        | NAME nameop value        # NameCond
+        | SIZE relop NUMBER        # SizeCond
+        | CREATED relop time       # CreatedCond
+        | CREATED EQ RECENTLY      # RecentCond
+        | DATE_MODIFIED relop time # ModifiedCond
+        ;
 
-value : STRING | BAREWORD ;
+relop   : EQ | GTE | GT | LTE | LT | NEQ ;
+nameop  : EQ | NEQ | CONTAINS | LIKE ;
+value   : STRING | BAREWORD | NUMBER ;
+time    : NUMBER (DAYS | MONS | YRS) ;
 
-time  : NUMBER DAYS
-      | NUMBER MONS
-      | NUMBER YRS
-      ;
-
-// Lexer Rules
-FIND          : 'find' ;
-FROM          : 'from' ;
-WHERE         : 'where' ;
-EXT           : 'ext' ;
-CREATED       : 'created' ;
+// Lexer: keywords first, BAREWORD last
+FIND : 'find' ;
+FROM : 'from' ;
+WHERE : 'where' ;
+BEGIN : 'begin' ;
+END : 'end' ;
+FILE : 'file' ;
+EXT : 'ext' ;
+NAME : 'name' ;
+SIZE : 'size' ;
+CREATED : 'created' ;
 DATE_MODIFIED : 'date-modified' ;
-RECENTLY      : 'recently' ;
-BEGIN         : 'begin' ;
-END           : 'end' ;
-SIZE          : 'size' ;
-CONTAINS      : 'contains' ;
-FILE          : 'file' ;
-DAYS          : 'days' ;
-MONS          : 'months' ;
-YRS           : 'yrs' ;
-AND           : 'and' ;
-OR            : 'or' ;
-NOT           : 'not' ;
-NOR           : 'nor' ;
-EQ            : '=' ;
-GTE           : '>=' ;
-GT            : '>' ;
-LTE           : '<=' ;
-LT            : '<' ;
-NEQ           : '!=' ;
-NUMBER        : [0-9]+ ('.' [0-9]+)? ;
-STRING        : '\'' (~["])* '\'' ;
-BAREWORD      : [a-zA-Z0-9_.-]+;
-WS            : [ \t\n\r]+ -> skip ;
+RECENTLY : 'recently' ;
+CONTAINS : 'contains' ;
+LIKE : 'like' ;
+DAYS : 'days' ;
+MONS : 'months' ;
+YRS : 'yrs' ;
+AND : 'and' ;     OR : 'or' ;       NOT : 'not' ;
+EQ : '=' ;
+GTE : '>=' ;
+GT : '>' ;
+LTE : '<=' ;
+LT : '<' ;
+NEQ : '!=' ;
+LPAREN : '(' ;
+RPAREN : ')' ;
+NUMBER   : [0-9]+ ('.' [0-9]+)? ;
+STRING   : '\'' (~['])* '\'' ;
+BAREWORD : [a-zA-Z0-9_.-]+ ;
+WS       : [ \t\r\n]+ -> skip ;

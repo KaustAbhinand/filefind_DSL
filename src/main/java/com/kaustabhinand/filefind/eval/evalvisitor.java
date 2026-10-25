@@ -1,118 +1,142 @@
-// This file parses the input query - with the Visitor pattern.
+// This file turns the parse tree into a search path, an optional filename, and an Expr tree.
+// Traverse the visitor pattern.
 
 package com.kaustabhinand.filefind.eval;
 
-import com.kaustabhinand.filefind.model.ExprCondition;
 import com.kaustabhinand.filefind.filefindBaseVisitor;
 import com.kaustabhinand.filefind.filefindParser;
+import com.kaustabhinand.filefind.model.Conditions;
+import com.kaustabhinand.filefind.model.Expr;
+import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.util.*;
+import java.time.Period;
+
 public class evalvisitor extends filefindBaseVisitor<Object> {
-    private  String searchpath = ".";
-    private  String filename = null;
-    public String getSearchPath() {return searchpath;}
-    public String getFilename() {return filename;}
+    private String searchpath = ".";   // current directory by default - avoids accidental full-tree scans
+    private String filename = null;
+    private Expr filter = null;
 
-    private List<ExprCondition> conditions = new ArrayList<>();
-    public List<ExprCondition> getConditions() {return conditions;}
+    public String getSearchPath() { return searchpath; }
+    public String getFilename()   { return filename; }
+    public Expr getFilter()       { return filter; }
+
+    // ---------- query ----------
 
     @Override
     public Object visitQuery(filefindParser.QueryContext ctx) {
-        // Implementation for visiting Query nodes
-
-        if(ctx.FILE() != null) { // FILE keyword is given.
-            if(ctx.FROM() != null) {
-                if (ctx.STRING(0) == null) {
-                    throw new IllegalArgumentException(
-                            "Malformed query: expected a path after 'from'.");
-                }
-                searchpath = ctx.STRING(0).getText().replace("'", "");
-            }
-
-            else {
-                searchpath = "."; // current directory, by default - avoids accidental full-tree scans
-            }
+        // 'find <subject>': either the keyword 'file' or a quoted exact filename
+        if (ctx.subject().STRING() != null) {
+            filename = unquote(ctx.subject().STRING().getText());
         }
-
-        else {
-            if (ctx.STRING(0) == null) {
-                throw new IllegalArgumentException(
-                        "Malformed query: expected a quoted filename after 'find'.");
-            }
-            filename = ctx.STRING(0).getText().replace("'", "");
-
-            if(ctx.FROM() != null) {
-                if (ctx.STRING(1) == null) {
-                    throw new IllegalArgumentException(
-                            "Malformed query: expected a path after 'from'.");
-                }
-                searchpath = ctx.STRING(1).getText().replace("'", "");
-            }
+        // The only STRING directly under query is the 'from' path
+        if (ctx.STRING() != null) {
+            searchpath = unquote(ctx.STRING().getText());
         }
-
-        return visitChildren(ctx);
+        // Covers both 'where expr' and 'begin expr end'
+        if (ctx.expr() != null) {
+            filter = (Expr) visit((ParseTree) ctx.expr());
+        }
+        return null;
     }
 
+    // ---------- logical structure ----------
 
     @Override
-    public Object visitExpr(filefindParser.ExprContext ctx) {
-        // The logop (and/or/not/nor) that joins THIS condition to the next
-        // one, if this expr alternative has a trailing "logop expr".
-        String joinOp = (ctx.logop() != null) ? ctx.logop().getText() : null;
+    public Object visitNotExpr(filefindParser.NotExprContext ctx) {
+        return new Expr.Not((Expr) visit(ctx.expr()));
+    }
 
-        if(ctx.EXT() != null) { // Extension is given
-            if (ctx.relop() == null || ctx.value() == null) {
-                throw new IllegalArgumentException(
-                        "Malformed query: 'ext' requires an operator and a value.");
-            }
-            String op = ctx.relop().getText();
-            String value = ctx.value().getText().replace("'", "");
-            conditions.add(new ExprCondition("ext", op, value, joinOp));
+    @Override
+    public Object visitAndExpr(filefindParser.AndExprContext ctx) {
+        return new Expr.And((Expr) visit(ctx.expr(0)), (Expr) visit(ctx.expr(1)));
+    }
+
+    @Override
+    public Object visitOrExpr(filefindParser.OrExprContext ctx) {
+        return new Expr.Or((Expr) visit(ctx.expr(0)), (Expr) visit(ctx.expr(1)));
+    }
+
+    @Override
+    public Object visitParenExpr(filefindParser.ParenExprContext ctx) {
+        return visit(ctx.expr());
+    }
+
+    @Override
+    public Object visitCondExpr(filefindParser.CondExprContext ctx) {
+        return visit(ctx.cond());
+    }
+
+    // ---------- conditions ----------
+
+    @Override
+    public Object visitExtCond(filefindParser.ExtCondContext ctx) {
+        String op = ctx.relop().getText();
+        if (!op.equals("=") && !op.equals("!=")) {
+            throw new IllegalArgumentException(
+                    "'ext' only supports '=' and '!=' (got '" + op + "').");
         }
+        return Conditions.ext(op, unquote(ctx.value().getText()));
+    }
 
-        if(ctx.SIZE() != null) { // Size is given
-            if (ctx.relop() == null || ctx.NUMBER() == null) {
-                throw new IllegalArgumentException(
-                        "Malformed query: 'size' requires an operator and a number.");
-            }
-            String op = ctx.relop().getText();
-            String value = ctx.NUMBER().getText();
-            conditions.add(new ExprCondition("size", op, value, joinOp));
+    @Override
+    public Object visitNameCond(filefindParser.NameCondContext ctx) {
+        String op = ctx.nameop().getText();
+        String value = unquote(ctx.value().getText());
+        return switch (op) {
+            case "="        -> Conditions.name("=", value);
+            case "!="       -> Conditions.name("!=", value);
+            case "contains" -> Conditions.nameContains(value);
+            case "like"     -> Conditions.nameLike(value);
+            default -> throw new IllegalArgumentException("Unknown name operator: " + op);
+        };
+    }
+
+    @Override
+    public Object visitSizeCond(filefindParser.SizeCondContext ctx) {
+        return Conditions.size(ctx.relop().getText(),
+                Double.parseDouble(ctx.NUMBER().getText()));
+    }
+
+    @Override
+    public Object visitCreatedCond(filefindParser.CreatedCondContext ctx) {
+        Span s = span(ctx.time());
+        return Conditions.created(ctx.relop().getText(), s.period(), s.label());
+    }
+
+    @Override
+    public Object visitRecentCond(filefindParser.RecentCondContext ctx) {
+        return Conditions.createdRecently();
+    }
+
+    @Override
+    public Object visitModifiedCond(filefindParser.ModifiedCondContext ctx) {
+        Span s = span(ctx.time());
+        return Conditions.modified(ctx.relop().getText(), s.period(), s.label());
+    }
+
+    // ---------- helpers ----------
+
+    private record Span(Period period, String label) {}
+
+    private static Span span(filefindParser.TimeContext t) {
+        String raw = t.NUMBER().getText();
+        int n;
+        try {
+            n = Integer.parseInt(raw);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Time amounts must be whole numbers, got '" + raw + "'.");
         }
+        if (t.MONS() != null) return new Span(Period.ofMonths(n), n + " months");
+        if (t.YRS() != null)  return new Span(Period.ofYears(n),  n + " years");
+        return new Span(Period.ofDays(n), n + " days");   // DAYS, or the default if the unit becomes optional
+    }
 
-        if(ctx.CREATED() != null && ctx.RECENTLY() != null) { // Recently is given.
-            conditions.add(new ExprCondition("created", "=", "recently", joinOp));
+    private static String unquote(String s) {
+        if (s.length() >= 2 && s.startsWith("'") && s.endsWith("'")) {
+            return s.substring(1, s.length() - 1);
         }
-
-        if(ctx.CREATED() != null && ctx.RECENTLY() == null) { // Time is mentioned.
-            if (ctx.relop() == null || ctx.time() == null) {
-                throw new IllegalArgumentException(
-                        "Malformed query: 'created' requires an operator and a time value.");
-            }
-            String op = ctx.relop().getText();
-            String time = ctx.time().getText();
-            conditions.add(new ExprCondition("created", op, time, joinOp));
-        }
-
-        if(ctx.CONTAINS() != null) { // Contains is given.
-            if (ctx.value() == null) {
-                throw new IllegalArgumentException(
-                        "Malformed query: 'contains' requires a value.");
-            }
-            String value = ctx.value().getText().replace("'", "");
-            conditions.add(new ExprCondition("contains", "contains", value, joinOp));
-        }
-
-        if(ctx.DATE_MODIFIED() != null) { // Date modified is given.
-            if (ctx.relop() == null || ctx.time() == null) {
-                throw new IllegalArgumentException(
-                        "Malformed query: 'date-modified' requires an operator and a time value.");
-            }
-            String op = ctx.relop().getText();
-            String date_modified = ctx.time().getText();
-            conditions.add(new ExprCondition("date_modified", op, date_modified, joinOp));
-        }
-
-        return visitChildren(ctx);
+        return s;
     }
 }
+

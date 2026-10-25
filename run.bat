@@ -1,2 +1,2 @@
 @echo off
-java -cp ".;C:\antlr\antlr-4.13.2-complete.jar" Main %*
+java -jar "C:\antlr\filefind\target\filefind-1.0-SNAPSHOT.jar" %*

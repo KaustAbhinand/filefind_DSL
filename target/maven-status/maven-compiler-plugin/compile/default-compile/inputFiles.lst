@@ -1,7 +1,10 @@
 C:\antlr\filefind\src\main\java\com\kaustabhinand\filefind\cli\FileFindCommand.java
+C:\antlr\filefind\src\main\java\com\kaustabhinand\filefind\cli\ThrowingErrorListener.java
 C:\antlr\filefind\src\main\java\com\kaustabhinand\filefind\eval\evalvisitor.java
 C:\antlr\filefind\src\main\java\com\kaustabhinand\filefind\exec\Executor.java
-C:\antlr\filefind\src\main\java\com\kaustabhinand\filefind\model\ExprCondition.java
+C:\antlr\filefind\src\main\java\com\kaustabhinand\filefind\model\Conditions.java
+C:\antlr\filefind\src\main\java\com\kaustabhinand\filefind\model\Expr.java
+C:\antlr\filefind\src\main\java\com\kaustabhinand\filefind\model\FileInfo.java
 C:\antlr\filefind\target\generated-sources\antlr4\com\kaustabhinand\filefind\filefindBaseVisitor.java
 C:\antlr\filefind\target\generated-sources\antlr4\com\kaustabhinand\filefind\filefindLexer.java
 C:\antlr\filefind\target\generated-sources\antlr4\com\kaustabhinand\filefind\filefindParser.java
