@@ -1,7 +1,7 @@
 # install.ps1 - installs FileFind for the current user (no admin needed)
 $ErrorActionPreference = "Stop"
 
-$repo    = "KaustAbhinand/filefind"
+$repo    = "KaustAbhinand/filefind_DSL"
 $dir     = Join-Path $env:LOCALAPPDATA "Programs\FileFind"
 $zipPath = Join-Path $env:TEMP "filefind.zip"
 $extract = Join-Path $env:TEMP "filefind-extract"
