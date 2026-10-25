@@ -1,4 +1,4 @@
-# FILEFIND - A Custom DSL
+# FILEFIND - A Custom DSL - Version 1.0
 
 A custom Domain Specific Language (DSL) used to retrieve files on the computer.
 
@@ -11,7 +11,7 @@ A custom Domain Specific Language (DSL) used to retrieve files on the computer.
 ## Sample Query
 
 ```sql
-find file from "C:\Users" where ext = "pdf"
+filefind "find file from 'C:\Users' where ext = pdf"
 ```
 
 Retrieves all PDF files from the Users directory.
@@ -19,17 +19,19 @@ Retrieves all PDF files from the Users directory.
 ## Supported Conditions
 
 - `ext` — file extension (e.g. `ext = "pdf"`)
-- `size` — file size in bytes (e.g. `size > 10000`)
+- `size` — file size (e.g. `size > 10000MB`) (no spaces between number and units)
 - `created` — creation date (e.g. `created = recently`)
 - `date-modified` — last modified date (e.g. `date-modified < 30`)
+- `name like` - search files by name
+- `created = recently` - search files modified 15 days ago
 
-## Roadmap
+## Operators
+- All logical operators
+- Boolean: `and`, `or`, `not`
 
-- [ ] Mathematics in conditions
-- [ ] Error messages
-- [ ] Installer / JAR packaging
-- [ ] Logical operators (and, or, nor)
+## Installation command
+- Navigate to powershell (no admin permission required)
+- paste this command: `irm https://raw.githubusercontent.com/KaustAbhinand/filefind_DSL/main/install.ps1 | iex`
+- run `filefind --help` to confirm the installation worked.
 
----
-
-More features coming soon! :)
+Check the sample_queries doc provided, you'll get a fair idea on the syntax :)
